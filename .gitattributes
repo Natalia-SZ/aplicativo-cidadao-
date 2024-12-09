@@ -1,2 +1,143 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Estruturas de dados
+typedef struct {
+int id;
+char descricao[256];
+char status[20];
+} Denuncia;
+
+typedef struct {
+int id;
+char nome[50];
+char email[50];
+char senha[20];
+} Usuario;
+
+// Variáveis globais
+Usuario usuarios[100];
+Denuncia denuncias[100];
+int usuario_count = 0, denuncia_count = 0;
+
+// Funções auxiliares
+void cadastrar_usuario() {
+Usuario novo;
+printf("\n--- Cadastro de Usuário ---\n");
+printf("Nome: ");
+scanf(" %[^\n]", novo.nome);
+printf("Email: ");
+scanf(" %[^\n]", novo.email);
+printf("Senha: ");
+scanf(" %[^\n]", novo.senha);
+
+novo.id = usuario_count + 1;
+usuarios[usuario_count++] = novo;
+printf("\nUsuário cadastrado com sucesso! ID: %d\n", novo.id);
+}
+
+int login_usuario() {
+char email[50], senha[20];
+printf("\n--- Login ---\n");
+printf("Email: ");
+scanf(" %[^\n]", email);
+printf("Senha: ");
+scanf(" %[^\n]", senha);
+for (int i = 0; i < usuario_count; i++) {
+if (strcmp(usuarios[i].email, email) == 0 && strcmp(usuarios[i].senha, senha) == 0) {
+printf("\nLogin realizado com sucesso! Bem-vindo, %s.\n", usuarios[i].nome);
+return usuarios[i].id;
+}
+}
+printf("\nCredenciais inválidas.\n");
+return -1;
+}
+
+void registrar_denuncia(int user_id) {
+if (user_id == -1) {
+printf("\nVocê precisa estar logado para registrar uma denúncia.\n");
+return;
+}
+Denuncia nova;
+nova.id = denuncia_count + 1;
+printf("\n--- Registrar Denúncia ---\n");
+printf("Descrição da Denúncia: ");
+scanf(" %[^\n]", nova.descricao);
+strcpy(nova.status, "Em aberto");
+
+denuncias[denuncia_count++] = nova;
+printf("\nDenúncia registrada com sucesso! ID: %d\n", nova.id);
+}
+
+void listar_denuncias() {
+printf("\n--- Lista de Denúncias ---\n");
+for (int i = 0; i < denuncia_count; i++) {
+printf("ID: %d | Descrição: %s | Status: %s\n",
+denuncias[i].id, denuncias[i].descricao, denuncias[i].status);
+}
+}
+void atualizar_status() {
+int id;
+char novo_status[20];
+printf("\n--- Atualizar Status da Denúncia ---\n");
+printf("ID da Denúncia: ");
+scanf("%d", &id);
+
+for (int i = 0; i < denuncia_count; i++) {
+if (denuncias[i].id == id) {
+printf("Novo Status (Em aberto, Em andamento, Resolvido): ");
+scanf(" %[^\n]", novo_status);
+strcpy(denuncias[i].status, novo_status);
+printf("\nStatus atualizado com sucesso!\n");
+return;
+}
+}
+printf("\nDenúncia não encontrada.\n");
+}
+
+// Menu principal
+void menu() {
+int opcao, user_id = -1;
+do {
+printf("\n--- Menu Principal ---\n");
+printf("1. Cadastrar Usuário\n");
+printf("2. Login\n");
+printf("3. Registrar Denúncia\n");
+printf("4. Listar Denúncias\n");
+printf("5. Atualizar Status de Denúncia\n");
+printf("6. Sair\n");
+printf("Escolha uma opção: ");
+scanf("%d", &opcao);
+
+switch (opcao) {
+case 1:
+cadastrar_usuario();
+break;
+case 2:
+user_id = login_usuario();
+break;
+case 3:
+registrar_denuncia(user_id);
+break;
+case 4:
+listar_denuncias();
+break;
+case 5:
+atualizar_status();
+break;
+case 6:
+printf("\nEncerrando o programa...\n");
+break;
+default:
+printf("\nOpção inválida. Tente novamente.\n");
+}
+} while (opcao != 6);
+}
+
+int main() {
+menu();
+return 0;
+}
